@@ -1,88 +1,84 @@
-import { useCallback } from 'react';
-import { useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
+import debounce from 'lodash/debounce';
 import './App.scss';
 import { getUser, TodoForm } from './components/TodoForm';
 import { TodoList } from './components/TodoList';
 import { Todo, TodoWithoutUser } from './types/Todo';
 
-const todosFromServer: TodoWithoutUser[] = [
-  {
-    id: 1,
-    title: 'delectus aut autem',
-    completed: true,
-    userId: 1,
-  },
-  {
-    id: 15,
-    title: 'some other todo',
-    completed: false,
-    userId: 1,
-  },
-  {
-    id: 2,
-    title: 'quis ut nam facilis et officia qui',
-    completed: false,
-    userId: 4,
-  },
-];
-
-let oldTodos: Todo[] = [];
-let oldDelete: (todo: Todo) => void = () => {};
-
 export function App() {
-  const [todos, setTodos] = useState<Todo[]>(() => {
-    return todosFromServer.map(todo => ({
-      ...todo,
-      user: getUser(todo.userId),
-    }))
-  });
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
-  console.log(oldTodos, todos, oldTodos === todos);
-  oldTodos = todos;
-  
-  function addTodo(newTodo: Todo) {
-    setTodos([...todos, newTodo])
-  }
+  // useEffect(() => {
+  //   const timerId = setTimeout(setDebouncedQuery, 1000, query);
+
+  //   return () => clearTimeout(timerId);
+  // }, [query]);
+
+  useEffect(() => {
+    // eslint-disable-next-line max-len
+    fetch('https://mate-academy.github.io/react_dynamic-list-of-todos/api/todos.json')
+      .then(res => res.json())
+      .then((todosFromServer: TodoWithoutUser[]) => {
+        setTodos(todosFromServer.slice(-10).map(todo => ({
+          ...todo,
+          user: getUser(todo.userId),
+        })));
+      });
+  }, []);
+
+  const applyQuery = useCallback(
+    debounce(setDebouncedQuery, 1000),
+    [],
+  );
+
+  const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(event.target.value);
+    applyQuery(event.target.value);
+  };
+
+  const addTodo = (newTodo: Todo) => {
+    setTodos(currentTodos => [...currentTodos, newTodo]);
+  };
 
   const deleteTodo = useCallback(
     (todoToDelete: Todo) => {
-      setTodos(todos.filter(
+      setTodos(currentTodos => currentTodos.filter(
         todo => todo.id !== todoToDelete.id,
       ));
     },
 
-    [todos],
+    [],
   );
 
-  console.log(oldDelete, deleteTodo, oldDelete === deleteTodo);
-  oldDelete = deleteTodo;
-  
+  const updateTodo = useMemo(() => {
+    return (updatedTodo: Todo) => {
+      setTodos(currentTodos => currentTodos.map(
+        todo => (todo.id === updatedTodo.id ? updatedTodo : todo),
+      ));
+    };
+  }, []);
 
-  // function updateTodo(updatedTodo: Todo) {
-  //   setTodos(todos.map(todo => {
-  //     if (todo.id !== updatedTodo.id) {
-  //       return todo;
-  //     }
-
-  //     return updatedTodo;
-  //   }));
-  // }
+  const visibleTodos = todos.filter(
+    todo => todo.title.toLowerCase().includes(debouncedQuery.toLowerCase()),
+  );
 
   return (
     <div className="App">
       <input
         type="text"
         value={query}
-        onChange={event => setQuery(event.target.value)}
+        onChange={handleQueryChange}
       />
       <TodoForm onSubmit={addTodo} />
       <TodoList
-        todos={todos}
+        todos={visibleTodos}
         onTodoDeleted={deleteTodo}
+        onTodoUpdated={updateTodo}
       />
     </div>
   );
 }
-
-

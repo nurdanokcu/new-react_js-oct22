@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Todo } from '../types/Todo';
 import { User } from '../types/User';
 
-
 export const usersFromServer: User[] = [
   {
     id: 1,
@@ -73,7 +72,7 @@ export function getUser(id: number) {
 type Props = {
   onSubmit: (todo: Todo) => void,
   todo?: Todo,
-}
+};
 
 export const TodoForm: React.FC<Props> = ({ onSubmit, todo }) => {
   const [newTodoTitle, setNewTodoTitle] = useState(todo?.title || '');
@@ -98,7 +97,8 @@ export const TodoForm: React.FC<Props> = ({ onSubmit, todo }) => {
         value={newTodoTitle}
         onChange={(event) => {
           setNewTodoTitle(event.target.value);
-        }} />
+        }}
+      />
 
       <select
         value={selectedUserId}
@@ -114,7 +114,12 @@ export const TodoForm: React.FC<Props> = ({ onSubmit, todo }) => {
         ))}
       </select>
 
-      <button>{todo ? 'Save' : 'Add'}</button>
+      <button
+        type="submit"
+      >
+        {todo ? 'Save' : 'Add'}
+
+      </button>
     </form>
   );
 };

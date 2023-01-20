@@ -1,3 +1,11 @@
+edit todos
+
+render only 1 todo when adding a new one
+
+implement filtering with query
+
+debounce when filtering
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
