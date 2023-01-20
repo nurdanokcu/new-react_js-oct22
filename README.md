@@ -2,7 +2,7 @@
 
 # Todo App with debounced filtering
 
-[DEMO LINK](https://<your_account>.github.io/react_clock/)
+[DEMO LINK](https://nurdanokcu.github.io/new-react_js-oct22/)
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
