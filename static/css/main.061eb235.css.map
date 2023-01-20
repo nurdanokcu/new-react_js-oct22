@@ -1,0 +1,1 @@
+{"version":3,"file":"static/css/main.061eb235.css","mappings":"AAAA,KACE,kBAGF,aACE","sources":["App.scss"],"sourcesContent":[".App {\n  text-align: center;\n}\n\nbutton, input {\n  margin: 5px;\n}"],"names":[],"sourceRoot":""}
